@@ -100,8 +100,13 @@ module NoBrainer::Document::TableConfig
 
     def sync_indexes(options={})
       # NoBrainer internal models don't have indexes.
-      models = NoBrainer::Document.all(:types => [:user])
-      NoBrainer::Document::Index::Synchronizer.new(models).sync_indexes(options)
+      tables = []
+      NoBrainer.run { |r| r.table_list }.each do |table_name|
+        tables << table_name.classify.safe_constantize
+      end
+      true
+      tables = tables.compact
+      NoBrainer::Document::Index::Synchronizer.new(tables).sync_indexes(options)
     end
 
     def sync_schema(options={})
